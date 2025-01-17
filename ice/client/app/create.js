@@ -1,9 +1,8 @@
 /*
-   Name : aryankumar panchal
-   filename : add.js
-   course: INFT 2202
-   date : dec 16, 1 
-   description : add.js
+    name : Aryan panchal
+    date : 2025/01/17
+    file : create.js
+    description: create.js
 */
 // tell us what page we're on
 console.log('we are on the add page');

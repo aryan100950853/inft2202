@@ -1,10 +1,3 @@
-/*
-   Name : aryankumar panchal
-   filename : list.js
-   course: INFT 2202
-   date : dec 17, 1 
-   description : list.js
-*/
 
 console.log('we are on the list page');
 
