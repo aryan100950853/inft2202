@@ -5,100 +5,87 @@
     Description: Service constructor implements the functions in this file.
 */
 
-/*
- *  Service constructor
- */
 function AnimalService() {
-    function initAnimals(){
+    function initAnimals() {
         let animals = [];
-        let index = 0;
-        while(animals.length<300) {
+        for (let i = 0; i < 300; i++) {
             animals.push({
-                "name": `name ${index++}`,
+                "name": `name ${i}`,
                 "breed": "Grizzly Bear",
                 "legs": 4,
                 "eyes": 2,
                 "sound": "Moo"
-              });
+            });
         }
         return animals;
     }
-    // if there is no entry for animals in local storage
+    
+    // Initialize local storage with mock data if empty
     if (!localStorage.getItem('animals')) {
-        // https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage  
-        // create a new entry in local storage and put an empty array in it        
-        localStorage.setItem('animals', JSON.stringify([]))
-    }    
-}
-/*
- *
- */
-AnimalService.prototype.getAnimals = function() {
-    // this will always be set, because we did it in the constructor
-    return JSON.parse(localStorage.getItem('animals'));
-}
-AnimalService.prototype.getAnimalPage = function({page = 1, perPage = 15}) {
-    // this will always be set, because we did it in the constructor
-    let records = JSON.parse(localStorage.getItem('animals'));
-    let pagination = {
-        page: page,
-        perPage: perPage,
-        pages: Math.ceil(records.length/perPage)
+        localStorage.setItem('animals', JSON.stringify(initAnimals()));
     }
-    if(pagination.page < 1) pagination.page = 1;
-    if(pagination.page > pagination.pages) pagination.page=pagination.pages;
-    let start = (pagination.page-1)*perPage;
-    let end = start + perPage
-    return {
-        records: records.slice(start, end),
-        pagination
-    };
 }
-/*
- *
- */
+
+// Retrieve all animals
+AnimalService.prototype.getAnimals = function() {
+    return JSON.parse(localStorage.getItem('animals') || "[]");
+};
+
+// Retrieve paginated animals
+AnimalService.prototype.getAnimalPage = function({ page = 1, perPage = 15 }) {
+    let records = this.getAnimals();
+    let pagination = {
+        page,
+        perPage,
+        pages: Math.ceil(records.length / perPage)
+    };
+    
+    pagination.page = Math.max(1, Math.min(pagination.page, pagination.pages));
+    let start = (pagination.page - 1) * perPage;
+    let end = start + perPage;
+    
+    return { records: records.slice(start, end), pagination };
+};
+
+// Save a new animal
 AnimalService.prototype.saveAnimal = function(animal) {
-    // get a list of animals
     const animals = this.getAnimals();
-    // see if this animal already exists
-    if (animals.find(a => a.name == animal.name)) {
-        // tell the caller we're not going to save this
+    if (animals.find(a => a.name.toLowerCase() === animal.name.toLowerCase())) {
         throw new Error('An animal with that name already exists!');
     }
-    // if it doesn't, add it to the array
     animals.push(animal);
-    // and save it in storage again
     localStorage.setItem('animals', JSON.stringify(animals));
-    // tell the caller all was well
     return true;
-}
-/*
- *
- */
+};
+
+// Find an animal by name
 AnimalService.prototype.findAnimal = function(animalName) {
-    return null;
-}
+    const animals = this.getAnimals();
+    return animals.find(a => a.name.toLowerCase() === animalName.toLowerCase()) || null;
+};
 
-/*
- *
- */
-AnimalService.prototype.updateAnimal = function(animal) {
+// Update an existing animal
+AnimalService.prototype.updateAnimal = function(updatedAnimal) {
+    const animals = this.getAnimals();
+    const idx = animals.findIndex(a => a.name.toLowerCase() === updatedAnimal.name.toLowerCase());
+    if (idx === -1) {
+        throw new Error('Animal not found!');
+    }
+    animals[idx] = updatedAnimal;
+    localStorage.setItem('animals', JSON.stringify(animals));
+    return true;
+};
 
-    return false;
-}
-
-/*
- *
- */
+// Delete an animal
 AnimalService.prototype.deleteAnimal = function(animal) {
     const animals = this.getAnimals();
-    const idx = animals.findIndex(a => a.name == animal.name);
+    const idx = animals.findIndex(a => a.name.toLowerCase() === animal.name.toLowerCase());
     if (idx === -1) {
         throw new Error('That animal does not exist!');
     }
     animals.splice(idx, 1);
     localStorage.setItem('animals', JSON.stringify(animals));
     return true;
-}
+};
 
 export default new AnimalService();
