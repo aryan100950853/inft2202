@@ -1,35 +1,15 @@
-/*
-    Name: Aryan Panchal
-    Date: 2025/01/17
-    File: animal.service.mock.js
-    Description: Service constructor implements the functions in this file.
-*/
 
 /*
  *  Service constructor
  */
 function AnimalService() {
-    function initAnimals(){
-        let animals = [];
-        let index = 0;
-        while(animals.length<300) {
-            animals.push({
-                "name": `name ${index++}`,
-                "breed": "Grizzly Bear",
-                "legs": 4,
-                "eyes": 2,
-                "sound": "Moo"
-              });
-        }
-        return animals;
-    }
     // if there is no entry for animals in local storage
     if (!localStorage.getItem('animals')) {
-        // https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage  
-        // create a new entry in local storage and put an empty array in it        
+        // create a new entry in local storage and put an empty array in it
         localStorage.setItem('animals', JSON.stringify([]))
-    }    
+    }
 }
+
 /*
  *
  */
@@ -37,23 +17,7 @@ AnimalService.prototype.getAnimals = function() {
     // this will always be set, because we did it in the constructor
     return JSON.parse(localStorage.getItem('animals'));
 }
-AnimalService.prototype.getAnimalPage = function({page = 1, perPage = 15}) {
-    // this will always be set, because we did it in the constructor
-    let records = JSON.parse(localStorage.getItem('animals'));
-    let pagination = {
-        page: page,
-        perPage: perPage,
-        pages: Math.ceil(records.length/perPage)
-    }
-    if(pagination.page < 1) pagination.page = 1;
-    if(pagination.page > pagination.pages) pagination.page=pagination.pages;
-    let start = (pagination.page-1)*perPage;
-    let end = start + perPage
-    return {
-        records: records.slice(start, end),
-        pagination
-    };
-}
+
 /*
  *
  */
@@ -72,19 +36,31 @@ AnimalService.prototype.saveAnimal = function(animal) {
     // tell the caller all was well
     return true;
 }
+
 /*
  *
  */
 AnimalService.prototype.findAnimal = function(animalName) {
-    return null;
+    const animals = this.getAnimals();
+    const animal = animals.find(a => a.name == animalName);
+    if (!animal) {
+        throw new Error('That animal does not exist!');
+    }
+    return animal;
 }
 
 /*
  *
  */
 AnimalService.prototype.updateAnimal = function(animal) {
-
-    return false;
+    const animals = this.getAnimals();
+    const idx = animals.findIndex(a => a.name == animal.name);
+    if (idx === -1) {
+        throw new Error('That animal does not exist!');
+    }
+    animals[idx] = animal;
+    localStorage.setItem('animals', JSON.stringify(animals));
+    return true;
 }
 
 /*
