@@ -1,4 +1,9 @@
-
+/*
+    name : Aryan panchal
+    date : 2025/01/17
+    file : animal.service.mock.js
+    description: servicce cinstructor impliment the functions in this file 
+*/
 console.log('we are on the list page');
 
 /* do table stuff */
