@@ -10,11 +10,14 @@ const store = JSON.parse(localStorage.getItem('messages'));
  */
 const container = document.getElementById('message-container');
 if (store.length) {
+    // draw all the stored messages
     const elements = store.map(drawMessageCard);
-    console.log(elements)
-    return elements;
+    elements.forEach(element => container.appendChild(element));  // Append to container
 } else {
-    // draw error message
+    // Draw an error message if no messages are stored
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = 'No messages available.';
+    container.appendChild(errorMessage);
 }
 
 // get a reference to the form
@@ -23,13 +26,13 @@ const formElement = document.getElementById('contact-form');
 formElement.addEventListener('submit', formSubmitHandler);
 
 /*
- *
+ * Handle form submission and store message
  */
-function formSubmitHandler (event) {
+function formSubmitHandler(event) {
     // stop the default handler from executing
     event.preventDefault();
 
-    // log out some valuesx
+    // log out some values
     console.log(`name: ${event.target.name.value}`);
     console.log(`phone: ${event.target.phone.value}`);
     console.log(`email: ${event.target.email.value}`);
@@ -41,30 +44,33 @@ function formSubmitHandler (event) {
         phone: event.target.phone.value,
         email: event.target.email.value,
         message: event.target.message.value,
-    })
+    });
 
     // try to store it
     store.push(message);
-    localStorage.setItem('messages', JSON.stringify(store));l
+    localStorage.setItem('messages', JSON.stringify(store));
 }
 
-/*
- *  @param ContactMessage
- *  @return Element
- */
-function drawMessageCard (message) {
+
+function drawMessageCard(message) {
     // create a new card element
     const card = document.createElement('div');
-    console.log(message.description);
+    card.classList.add('card', 'mb-3');
 
+    // Add the content to the card
+    card.innerHTML = `
+        <div class="card-body">
+            <h5 class="card-title">${message.name}</h5>
+            <p class="card-text"><strong>Phone:</strong> ${message.phone}</p>
+            <p class="card-text"><strong>Email:</strong> ${message.email}</p>
+            <p class="card-text"><strong>Message:</strong> ${message.message}</p>
+        </div>
+    `;
 
     return card;
 }
 
-/*
- *  @param ContactMessageParams
- *  @return ContactMessage
- */
+
 function ContactMessage({ name, phone, email, message }) {
     this.name = name;
     this.phone = phone;
